@@ -27,6 +27,7 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 # specify the executable target to be built
 add_executable(ar-live src/main.cpp)
+# add_executable(ar-live src/glTest.cpp)
 
 # tell it to link the executable target against OpenCV
 target_link_libraries(ar-live ${OpenCV_LIBS} )
@@ -45,9 +46,9 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 
-include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
+include_directories( ${OPENGL_INCLUDE_DIR}  ${GLUT_INCLUDE_DIR} )
 
-target_link_libraries(ar-live ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+target_link_libraries(ar-live ${OPENGL_gl_LIBRARY} ${GLUT_glut_LIBRARY} )
 
 # target_link_libraries(ar-live OpenGL::GL)
 target_link_libraries(ar-live glfw)

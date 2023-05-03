@@ -51,17 +51,19 @@ float dist_data[1][5] =  {{0.17423076, -0.43449858, -0.04052579,  0.03844378, -0
 cv::Mat distCoeffs(1, 5, CV_32F, dist_data);
 
 void display() {
-   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+   glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // Set background color to black and opaque
    glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
- 
+
    // Draw a Red 1x1 Square centered at origin
-   glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
-      glColor3f(1.0f, 0.0f, 0.0f); // Red
-      glVertex2f(-0.5f, -0.5f);    // x, y
-      glVertex2f( 0.5f, -0.5f);
-      glVertex2f( 0.5f,  0.5f);
-      glVertex2f(-0.5f,  0.5f);
-   glEnd();
+//    glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
+    //   glColor3f(1.0f, 0.0f, 0.0f); // Red
+    //   glVertex2f(-0.5f, -0.5f);    // x, y
+    //   glVertex2f( 0.5f, -0.5f);
+    //   glVertex2f( 0.5f,  0.5f);
+    //   glVertex2f(-0.5f,  0.5f);
+//    glEnd();
+   glutSolidTeapot(0.5f);
+   glMatrixMode(GL_MODELVIEW);
  
    glFlush();  // Render now
 }
@@ -72,7 +74,7 @@ int main(int argc, char** argv) {
 
     glutInit(&argc, argv);                 // Initialize GLUT
     glutCreateWindow("OpenGL Setup Test"); // Create a window with the given title
-    glutInitWindowSize(320, 320);   // Set the window's initial width & height
+    glutInitWindowSize(1080, 1080);   // Set the window's initial width & height
     glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
     glutDisplayFunc(display); // Register display callback handler for window re-paint
     glutMainLoop();           // Enter the infinitely event-processing loop
