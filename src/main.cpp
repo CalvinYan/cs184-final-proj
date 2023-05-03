@@ -1,12 +1,30 @@
 // main.cpp
 
+#define GL_SILENCE_DEPRECATION
+
+// Without this gl.h gets included instead of gl3.h
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
+#include <OpenGL/gl.h>
+// #include "GL/glew.h"
+// #include <GL/glew.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+
+// For includes related to OpenGL, make sure their are included after glfw3.h
+#include <OpenGL/gl3.h>
+
 #include <iostream>
 #include <opencv2/aruco.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
 
+#include "CGL/CGL.h"
+
 using namespace std;
+using namespace CGL;
 
 /*
   Intrinsic camera parameters
@@ -32,8 +50,33 @@ float dist_data[1][5] =  {{0.17423076, -0.43449858, -0.04052579,  0.03844378, -0
 
 cv::Mat distCoeffs(1, 5, CV_32F, dist_data);
 
+void display() {
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+   glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
+ 
+   // Draw a Red 1x1 Square centered at origin
+   glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
+      glColor3f(1.0f, 0.0f, 0.0f); // Red
+      glVertex2f(-0.5f, -0.5f);    // x, y
+      glVertex2f( 0.5f, -0.5f);
+      glVertex2f( 0.5f,  0.5f);
+      glVertex2f(-0.5f,  0.5f);
+   glEnd();
+ 
+   glFlush();  // Render now
+}
+
+
+
 int main(int argc, char** argv) {
 
+    glutInit(&argc, argv);                 // Initialize GLUT
+    glutCreateWindow("OpenGL Setup Test"); // Create a window with the given title
+    glutInitWindowSize(320, 320);   // Set the window's initial width & height
+    glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
+    glutDisplayFunc(display); // Register display callback handler for window re-paint
+    glutMainLoop();           // Enter the infinitely event-processing loop
+    return 0;
     // if (argc != 2) {
         // cout << "Expecting a image file to be passed to program" << endl;
         // return -1;
@@ -71,6 +114,8 @@ int main(int argc, char** argv) {
 
     bool paused = false;
     int ctr = 0;
+
+
     for (;;) {
 
         cap.read(frameIn);
@@ -92,7 +137,7 @@ int main(int argc, char** argv) {
 
             std::vector<cv::Vec3d> rvecs, tvecs;
 
-            
+            // glMatrixMode(GL_MODELVIEW);
 
             // Set coordinate system
             float objPointData[4][3] = {{ -0.5,  0.5, 0},
