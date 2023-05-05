@@ -106,13 +106,17 @@
   </p>
 
   <h2>Technical Approach</h2>
-  <p> At this stage our project has accomplished three things:</p>
+  <p> At this stage our project has accomplished four things:</p>
   <ol>
     <li> It detects fiducial markers in a live video feed. </li>
     <li> It estimates the pose of the camera relative to the marker in the scene. </li>
     <li> It uses the estimated pose to render a scene over the marker in a realistic perspective </li>
+    <li> It employs image-based lighting techniques to adapt the render to its lighting environment, inducing
+          photorealism
+    </li>
   </ol>
 
+  <h3> Marker detection </h3>
   <p>
     We will explain how the marker detection part is decided and implemented. <br>
     At the beginning, we search a tutorial online, which uses the ORB(Oriented Rotated BRIEF) method in OpenCV, 
@@ -122,10 +126,20 @@
     brings higher requirement for the quality of the video and we have to make the target object clear enough in the environment,
     not to mention the target marker must be as flat as possible.<br>
     As shown in the vedio below, the implemented code using ORB is not ideal at all, we can see that there are non-ignorable 
-    noise on the 
-    
+    noise on the detection, so the result of the rendered model on the target is pretty unstable.<br>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <video width="400" height="300" controls autoplay>
+              <source src="videos/orb.mp4" type="video/mp4">
+            </video>
+          </td>
+        </tr>
+      </table>
+    </div>
 
-    First, we elected to use Aruco marker to do location detection. This process is based on finding correspondences between points in the real environment and their 2d image projection.
+    Then, we elected to use Aruco marker to do location detection. This process is based on finding correspondences between points in the real environment and their 2D image projection.
   </p>
   <p>some example of Aruco marker</p>
 
@@ -134,7 +148,7 @@
       <tr>
         <td>
           <img src="images/marker.png" align="middle" width="300px"/>
-          <figcaption align="middle">ArUco markere</figcaption>
+          <figcaption align="middle">ArUco marker</figcaption>
         </td>
       </tr>
     </table>
@@ -153,16 +167,53 @@
     This involves perspective transformation to obtain the marker in its canonical form, thresholding to separate white and black bits, and counting the amount of black or white pixels in each cell to determine if it is a white or black bit. 
     The bits are then analyzed to see if they belong to a specific dictionary, and error correction techniques are used if necessary.
   </p>
-  <p>then, we need to obtain camera pose. First, do calibrateCamera(), so that we can get the camera matrix and the distortion coefficinets.Then we should draw the  this can be done by cv::aruco::drawAxis</p>
 
+  <h3> Pose estimation </h3>
+  <p>Then, we need to obtain camera pose. First, do calibrateCamera(), so that we can get the camera matrix and the distortion coefficinets.Then we can draw the axis(we show video for this in result part). 
+    This can be done by cv::aruco::drawAxis</p>
+  <p>Last but not least, we have to caliborate the camera by ourselves first. </p>
 
-    <p>For the next step, we also want to build 3D models on the reference plane. This is equivalent to adding the column for z axis in our
-    original transformation matrix. We could use the two column that we already got to estimate the third column for the z axis. Then, we are able
-    to render 3D object in our camera.</p>
-    
-  <h3>Reflection</h3>
+  <h3> Rendering </h3>
   <p>
+    Since we will use OpenGL for the rendering of our AR object, we need to link the points we got from last step to our new scene created by OpenGL.
+    First, we convert the original image captured by our camera to OpenGL texture format and draw the scene based on this converted image.
+    Then, we load our object and overlay it on our scene based on the view matrix we defined.
+  </p>
+    
 
+  <h3> Image-based lighting </h3>
+    <p>First, we go through code in Project4 to find some useful function for IBL. In project4, it used Cubemap to do IBL. However, we found that in Cubemap, we must have 360 degree view(six sides for Cubemap), which can not be used in our final project, for we do not have 360 degree view. Moreover, it can be hard to implement in real-time situation.
+      So then we look up through other methods that can satisfy our goals.
+    </p>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3>Reflections</h3>
+  <p>
+    Through our implementation of our project, we had several key takeaways:
+    <ol>
+      <li> Set realistic goals. At the start we allowed curiosity and excitement to lead our design process. In the end, however, much more time was spent on tedious work than implementing exciting, cutting-edge techniques in computer graphics. Much of the project was spent overcoming technical roadblocks like setting up the OpenGL rendering pipeline from scratch and integrating it with OpenCV. We severely overestimated the degree to which past projects prepared us for this (in fact, we ended up not reusing project
+      code at all), and it was perhaps the most difficult and painstaking part of project development. Initial goals like use of animation and light probes were demonstrably out of reach, but we failed to consider this.
+      <li> This stuff is hard! 
+    </ol>
+    
+  </p>
+  </br>
+  <p>
+    Despite these challenges, we're immensly proud of the work that we've done, and hope that it has adequately
+    demonstrated what we have learned in this course, from mesh geometry to texture mapping to ray tracing to camera anatomy. We were unable to implement some of the features we were most excited about, but with more time and
+    resources, we would surely love to explore them further:
+    <ul>
+      <ol
+    </ul>
+  </p>
+  
   <h2>Results</h2>
 
   <p> This part, we apply Aruco marker, which is showed on the below video. we make the marker detection efficient enough for the live demo and stable enough to render some models on it</p>
@@ -180,7 +231,8 @@
       </tr>
     </table>
   </div>
-
+  <p>The below video is about our main model's demo. You can clearly see that, it can be stable, when we move the ArUco marker. 
+    Though, sometimes, at some specific location, it can be a liitle bit unstable.</p>
   <div align="middle">
     <table style="width=100%">
       <tr>
@@ -231,16 +283,16 @@
   </div>
   <p>it might be a little bit unstable, but you can see from video, it has quite good effects.</p>
     
-    <h2>Contributions from each group member</h2>
+    <h2>Contributions from each group member</h2> 
     <p>Calvin Yan: Decided on the project topic and scope, developed final marker tracking, rendering, and image based lighting code
 
     </p>
 
-    <p>Ruichi Zhang : Did some early researches and find staring point, implemented texture mapping, 
+    <p>Ruichi Zhang : Did some early researches and found staring point, implemented texture mapping on AR project, helped with development of some code
       
     </p>
 
-    <p>Yuntian Ke: Go through papers to find good IBL which can let us use it in real-time and even in situations we don't have 360 degree view. Prepare for slices; try to implement marker tracking for some simple models at the beginning. 
+    <p>Yuntian Ke: Go through papers to find good IBL which can let us use it in real-time and even in situations we don't have 360 degree view. Prepare for slices; implement marker tracking for some simple models from start. 
       
     </p>
 
@@ -251,13 +303,20 @@
   <h2>References</h2>
   <!-- List what resources, e.g. books, papers and/or online resources that are references for your project. List the computing platform, hardware and software resources that you will use for your project. You have a wide latitude here to use what you have access to, but be aware that you will have to support and trouble-shoot on your platform yourselves. If you are starting from an existing piece of code or system, describe and provide a pointer to it here.
     -->
-    <p>Most of our work so far started from these two tutorials: 
+    <p> Here are our final presentations:
+      <ul>
+        <li> <a href=https://docs.google.com/presentation/d/1z33PdWrq0jGQSRuR-vE-wGZcMeVtY2xqALYma_eQw54> For professors </a>
+        <li> <a href="com/presentation/d/1gwT1bwrUjPi4Uptc22YvsFdWho37op7oM9qZ996DNME"> For TAs </a>
+      </ul>
+    </p>
+    <p>Our milestone prototype was based on the following tutorials:
       <ul>
         <li> <a href="https://pyimagesearch.com/2021/01/04/opencv-augmented-reality-ar/">2D Augmented Reality with OpenCV using ArUco </a> </li>
         <li> <a href="https://bitesofcode.wordpress.com/2017/09/12/augmented-reality-with-python-and-opencv-part-1/">3D Augmented Reality with Projective Geometry</a></p> </li>
       </ul>
+      However, we want to emphasize that our final implementation ultimately strayed from these resources, and consists of original work.
   <p>
-    Additionally, as before we will use the work of Ian Curtis as a source of aesthetic inspiration for our final product:  <a href="https://twitter.com/XRarchitect">Twitter</a> and <a href="https://www.instagram.com/ianjcurtis/">Instagram</a>
+    As before, we have used the work of Ian Curtis as a source of aesthetic inspiration for our final product:  <a href="https://twitter.com/XRarchitect">Twitter</a> and <a href="https://www.instagram.com/ianjcurtis/">Instagram</a>
   </p>
   <p>
     Below are some resources we explored and discussed about for image-based lighting:
@@ -293,17 +352,16 @@
     </ul>
   </p>
 
-  
-
   <p>
-    As well as other development resources:
+    As well as other resources that were immensely helpful for development:
     <ul>
       <li>
-        <a href="https://developers.google.com/ar/develop">Google ARCore</a> for mobile development and augmented AR features like environmental lighting estimation
+        <a href="https://docs.opencv.org/4.x/index.html">OpenCV documentation</a> for video processing, fiducial marker tracking and positioning
       </li>
       <li>
-        <a href="https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html">OpenCV tutorial</a> for fiducial marker tracking and positioning
+        The <a href="https://www.cs.utexas.edu/users/fussell/courses/cs354/handouts/Addison.Wesley.OpenGL.Programming.Guide.8th.Edition.Mar.2013.ISBN.0321773039.pdf">Red Book</a>: a comprehensive guide to learning OpenGL
       </li>
+
     </ul>
   </p>
 
